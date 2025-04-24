@@ -1,7 +1,6 @@
 {
-  "name": "webhook-suri",
+  "name": "webhook-suri-lumieregyn",
   "version": "1.0.0",
-  "description": "Servidor de webhook para análise de conversas SURI",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
