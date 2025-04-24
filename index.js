@@ -1,40 +1,39 @@
-
 const express = require('express');
+const bodyParser = require('body-parser');
 const cors = require('cors');
 const app = express();
+const port = process.env.PORT || 10000;
 
 app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
 
-app.post('/conversa', (req, res) => {
-  const dados = req.body;
-
-  const nomeCliente = dados.cliente || 'Cliente não identificado';
-  const numeroCliente = dados.cliente_numero || 'Número não identificado';
-  const nomeVendedor = dados.vendedor || 'Vendedor não identificado';
-  const emailVendedor = dados.email_vendedor || 'E-mail não identificado';
-  const mensagem = dados.mensagem || '[Mensagem sem texto]';
-  const canal = dados.canal || 'Canal não identificado';
-
-  console.log('📩 Mensagem recebida:', mensagem);
-  console.log('👤 Cliente:', nomeCliente);
-  console.log('📞 Número do Cliente:', numeroCliente);
-  console.log('🙋 Vendedor:', nomeVendedor);
-  console.log('📧 E-mail do Vendedor:', emailVendedor);
-  console.log('📡 Canal:', canal);
-
-  res.status(200).json({
-    status: 'ok',
-    cliente: nomeCliente,
-    cliente_numero: numeroCliente,
-    vendedor: nomeVendedor,
-    email_vendedor: emailVendedor,
-    mensagem: mensagem,
-    canal: canal
-  });
+app.get('/', (req, res) => {
+    res.json({ status: "ok", mensagem: "Servidor webhook ativo para análise de conversas." });
 });
 
-const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando na porta ${PORT}`);
+app.post('/conversa', (req, res) => {
+    try {
+        const message = req.body.message?.text || "[Mensagem sem texto]";
+        const nomeVendedor = req.body.attendant?.Name || "Vendedor não identificado";
+        const emailVendedor = req.body.attendant?.Email || "E-mail não identificado";
+        const canal = req.body.channel?.Name || "Canal não identificado";
+        const nomeCliente = req.body.visitor?.Name || "Cliente não identificado";
+        const numeroCliente = req.body.visitor?.PhoneNumber || "Número não identificado";
+
+        console.log("📩 Mensagem recebida:", message);
+        console.log("👤 Cliente:", nomeCliente);
+        console.log("📞 Número do Cliente:", numeroCliente);
+        console.log("🙋 Vendedor:", nomeVendedor);
+        console.log("📧 E-mail do Vendedor:", emailVendedor);
+        console.log("📡 Canal:", canal);
+
+        res.json({ status: "ok", recebido: true });
+    } catch (err) {
+        console.error("Erro no processamento da conversa:", err);
+        res.status(500).json({ status: "erro", erro: err.message });
+    }
+});
+
+app.listen(port, () => {
+    console.log(`🚀 Servidor rodando na porta ${port}`);
 });
