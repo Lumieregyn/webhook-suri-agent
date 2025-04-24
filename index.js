@@ -5,15 +5,16 @@ const fs = require('fs');
 const app = express();
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const SURI_API_URL = process.env.SURI_API_URL;
+const SURI_API_TOKEN = process.env.SURI_API_TOKEN;
+const GESTOR_PHONE = "5562985299728"; // número fixo do gestor
 const PROMPT_TEMPLATE = fs.readFileSync('./prompt_checklist_gpt4o.txt', 'utf8');
 
 app.use(express.json({ limit: '10mb', strict: false }));
 app.use(express.urlencoded({ extended: true }));
 
-// Simulação de transcrição multimodal (para foco no esqueleto GPT)
 function montarConteudoConversacional(message) {
   let conteudo = '';
-
   if (message.text) conteudo += `Texto: ${message.text}\n`;
 
   if (Array.isArray(message.attachments)) {
@@ -23,8 +24,28 @@ function montarConteudoConversacional(message) {
       conteudo += `Anexo ${idx + 1}: tipo ${tipo}, url: ${url}\n`;
     });
   }
-
   return conteudo.trim();
+}
+
+async function enviarMensagemWhatsApp(destinatario, texto) {
+  try {
+    const payload = {
+      to: destinatario,
+      type: "text",
+      text: {
+        body: texto
+      }
+    };
+    await axios.post(SURI_API_URL, payload, {
+      headers: {
+        'Authorization': `Bearer ${SURI_API_TOKEN}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    console.log(`✅ Alerta enviado para ${destinatario}`);
+  } catch (error) {
+    console.error(`❌ Erro ao enviar para ${destinatario}:`, error?.response?.data || error.message);
+  }
 }
 
 app.post('/conversa', async (req, res) => {
@@ -49,9 +70,7 @@ app.post('/conversa', async (req, res) => {
     ['payload.channel.Name', channel.Name]
   ];
 
-  const missing = required
-    .filter(([_, value]) => !value)
-    .map(([field]) => field);
+  const missing = required.filter(([_, value]) => !value).map(([field]) => field);
 
   const hasContent = message.text ||
     message.audio ||
@@ -60,17 +79,14 @@ app.post('/conversa', async (req, res) => {
     (Array.isArray(message.attachments) && message.attachments.length > 0);
 
   if (!hasContent) missing.push('payload.message.(text|audio|file|image|attachments)');
-
   if (missing.length) {
     console.error(`[Erro] Payload incompleto. Faltando: ${missing.join(', ')}`);
     return res.status(400).json({ error: 'Payload incompleto', faltando: missing });
   }
 
-  // Conteúdo para análise
   const conteudo = montarConteudoConversacional(message);
   const prompt = PROMPT_TEMPLATE.replace('<<CONTEÚDO_DA_CONVERSA_AQUI>>', conteudo);
 
-  // Chamada para GPT-4o
   try {
     const response = await axios.post('https://api.openai.com/v1/chat/completions', {
       model: 'gpt-4o',
@@ -88,10 +104,29 @@ app.post('/conversa', async (req, res) => {
 
     const analise = response.data.choices[0].message.content;
     console.log('📌 Análise do Checklist GPT-4o:', analise);
+
+    if (analise.includes("⚠️")) {
+      const alerta = `🚨 *ATENÇÃO*
+O cliente *${user.Name}* está prestes a fechar pedido, mas ainda faltam confirmações:
+
+${analise}
+
+Responsável: *${attendant.Name}*
+Revisar agora antes de gerar a venda.`;
+
+      await enviarMensagemWhatsApp(GESTOR_PHONE, alerta);
+
+      if (user.Phone) {
+        await enviarMensagemWhatsApp(user.Phone, alerta);
+      } else {
+        console.log('📭 Cliente sem número. Enviar ao grupo manualmente.');
+      }
+    }
+
     res.status(200).json({ status: 'ok', analise });
   } catch (error) {
-    console.error('❌ Erro ao consultar GPT-4o:', error?.response?.data || error.message);
-    res.status(500).json({ error: 'Erro na análise GPT-4o' });
+    console.error('❌ Erro na análise GPT ou envio SURI:', error?.response?.data || error.message);
+    res.status(500).json({ error: 'Erro interno' });
   }
 });
 

@@ -1,7 +1,7 @@
 {
-  "name": "webhook-checklist-gpt4o",
+  "name": "webhook-checklist-alerta-suri",
   "version": "1.0.0",
-  "description": "Webhook com IA para análise de checklist comercial via GPT-4o",
+  "description": "Servidor webhook com checklist IA e envio automático WhatsApp via SURI",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"

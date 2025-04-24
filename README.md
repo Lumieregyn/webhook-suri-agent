@@ -1,30 +1,11 @@
-# Webhook IA Checklist – GPT-4o
+# Webhook Checklist + Alerta via WhatsApp (SURI)
 
-Este projeto recebe mensagens via webhook, analisa com GPT-4o se o checklist comercial foi seguido corretamente e retorna um alerta inteligente.
+Servidor Node.js com integração GPT-4o + envio de alerta para gestor e vendedor via SURI.
 
-## Requisitos
+## Passos
 
-- Node.js 16+
-- Conta na OpenAI com chave API (GPT-4o)
-- Endpoint ativo com SURI apontando para /conversa
+1. Crie o arquivo `.env` com base em `.env.example`
+2. Rode `npm install`
+3. Inicie com `node index.js`
 
-## Instalação
-
-```bash
-npm install
-```
-
-## Uso
-
-1. Copie `.env.example` para `.env`
-2. Insira sua chave da OpenAI (`OPENAI_API_KEY`)
-3. Inicie com:
-
-```bash
-node index.js
-```
-
-## Estrutura
-
-- `index.js`: servidor Express com integração GPT
-- `prompt_checklist_gpt4o.txt`: prompt inteligente de checklist
+O servidor recebe payloads da SURI, analisa com IA e dispara alertas automáticos.
