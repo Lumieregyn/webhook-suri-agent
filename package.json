@@ -1,12 +1,13 @@
-
 {
-  "name": "webhook-suri-lista",
+  "name": "webhook-suri-lumieregyn",
   "version": "1.0.0",
+  "description": "Agente IA Supervisor de Conversas - Integração com SURI",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.18.2"
   }
 }
