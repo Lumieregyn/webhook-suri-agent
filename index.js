@@ -26,7 +26,6 @@ app.post('/conversa', (req, res) => {
     .filter(([_, value]) => value === undefined || value === null || value === '')
     .map(([field]) => field);
 
-  // ⚠️ Mensagem de texto não é mais obrigatória: pode ser áudio, imagem, etc.
   const hasContent =
     message.text || message.audio || message.file || message.image;
 
@@ -38,8 +37,6 @@ app.post('/conversa', (req, res) => {
     console.error(`[Erro] Payload incompleto. Faltando: ${missing.join(', ')}`);
     return res.status(400).json({ error: 'Payload incompleto', faltando: missing });
   }
-
-  // TODO: lógica de análise multimodal
 
   res.status(200).json({ status: 'ok' });
 });
