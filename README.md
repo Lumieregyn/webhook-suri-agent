@@ -1,21 +1,32 @@
-# Servidor Webhook Lumieregyn
+# Webhook Server - Lumieregyn
 
-Este projeto é um servidor Express simples com uma rota `/conversa` para análise de conversas.
+Servidor Node.js/Express para receber e analisar webhooks de conversas (via WhatsApp/SURI).
 
-## Instalação
+## Rotas
 
-```bash
-npm install
-```
+- **GET /**  
+  - Retorna status de saúde do servidor.
 
-## Execução
+- **POST /conversa**  
+  - Recebe JSON com campos `cliente`, `vendedor`, `mensagem` ou `checklist`.  
+  - Gera logs no console:
+    - `👤 Cliente: ...`
+    - `🙋 Vendedor: ...`
+    - `📩 Mensagem recebida: ...`
 
-```bash
-npm start
-```
+## Como usar
 
-O servidor iniciará na porta `10000` (pode ser configurado via `PORT`).
+1. Instalar dependências:
+   ```bash
+   npm install
+   ```
+2. Iniciar servidor:
+   ```bash
+   npm start
+   ```
+3. Testar localmente:
+   - `GET http://localhost:10000/`  
+   - `POST http://localhost:10000/conversa` com JSON no corpo.
 
-- **GET /**: Retorna status do servidor.
-- **POST /conversa**: Recebe payload JSON com campos `cliente`, `vendedor` e `message` (ou `mensagem`).
-
+4. Deploy:
+   - Suba no GitHub e conecte ao Render/Heroku.

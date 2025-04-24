@@ -1,13 +1,17 @@
-import express from 'express';
-import cors from 'cors';
-import analiseRouter from './rotas/analise.js';
-
+const express = require('express');
+const analiseRouter = require('./rotas/analise');
 const app = express();
-app.use(cors());
+
 app.use(express.json());
 
-app.get('/', (_, res) => res.json({ status: 'ok', mensagem: 'Servidor webhook ativo para análise de conversas.' }));
-app.use('/conversa', analiseRouter);
+// Health check
+app.get('/', (req, res) => {
+  res.json({ status: 'ok', mensagem: 'Servidor webhook ativo para análise de conversas.' });
+});
 
+// Analysis endpoint
+app.post('/conversa', analiseRouter);
+
+// Start server
 const port = process.env.PORT || 10000;
 app.listen(port, () => console.log(`🚀 Servidor rodando na porta ${port}`));
