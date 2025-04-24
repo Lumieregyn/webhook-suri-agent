@@ -1,13 +1,13 @@
 {
-  "name": "webhook-suri-payload-corrigido",
+  "name": "webhook-server-lumieregyn",
   "version": "1.0.0",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
     "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "body-parser": "^1.19.0"
+    "cors": "^2.8.5"
   }
 }
