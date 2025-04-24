@@ -1,34 +1,43 @@
 
 const express = require('express');
-const bodyParser = require('body-parser');
 const app = express();
-const PORT = process.env.PORT || 10000;
-
-app.use(bodyParser.json());
+app.use(express.json());
 
 app.post('/conversa', (req, res) => {
-    const data = req.body;
+  const data = req.body;
 
-    const vendedor = data?.attendant?.Name || 'Vendedor não identificado';
-    const cliente = data?.contact?.Name || data?.message?.from || 'Número não identificado';
-    const texto = data?.message?.text || '[Mensagem sem texto]';
+  // Extrair informações do contato
+  const nomeContato = data?.User?.FirstName || 'Nome não identificado';
+  const telefoneContato = data?.User?.Phone || 'Telefone não identificado';
 
-    console.log('📩 Mensagem recebida:', texto);
-    console.log('👤 Cliente:', cliente);
-    console.log('🙋 Vendedor:', vendedor);
+  // Extrair informações do canal
+  const nomeCanal = data?.Channel?.Name || 'Canal não identificado';
+  const usernameCanal = data?.Channel?.Username || 'Username não identificado';
 
-    res.status(200).json({
-        status: 'ok',
-        vendedor,
-        cliente,
-        textoRecebido: texto
-    });
+  // Extrair mensagem
+  const mensagem = data?.message?.text || '[Mensagem sem texto]';
+
+  console.log('📩 Mensagem recebida:', mensagem);
+  console.log('👤 Contato:', nomeContato);
+  console.log('📞 Telefone:', telefoneContato);
+  console.log('📡 Canal:', nomeCanal);
+  console.log('🔗 Username do Canal:', usernameCanal);
+
+  res.status(200).json({
+    status: 'ok',
+    contato: {
+      nome: nomeContato,
+      telefone: telefoneContato
+    },
+    canal: {
+      nome: nomeCanal,
+      username: usernameCanal
+    },
+    mensagem: mensagem
+  });
 });
 
-app.get('/', (req, res) => {
-    res.json({ status: 'ok', mensagem: 'Servidor webhook ativo com tratamento SURI' });
-});
-
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
-    console.log(`🚀 Servidor rodando na porta ${PORT}`);
+  console.log(`🚀 Servidor rodando na porta ${PORT}`);
 });
