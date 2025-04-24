@@ -1,39 +1,29 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
+const express = require("express");
+const bodyParser = require("body-parser");
 const app = express();
-const port = process.env.PORT || 10000;
+const PORT = process.env.PORT || 10000;
 
-app.use(cors());
 app.use(bodyParser.json());
 
-app.get('/', (req, res) => {
-    res.json({ status: "ok", mensagem: "Servidor webhook ativo para análise de conversas." });
+app.get("/", (req, res) => {
+  res.json({ status: "ok", mensagem: "Servidor webhook ativo para análise de conversas." });
 });
 
-app.post('/conversa', (req, res) => {
-    try {
-        const message = req.body.message?.text || "[Mensagem sem texto]";
-        const nomeVendedor = req.body.attendant?.Name || "Vendedor não identificado";
-        const emailVendedor = req.body.attendant?.Email || "E-mail não identificado";
-        const canal = req.body.channel?.Name || "Canal não identificado";
-        const nomeCliente = req.body.visitor?.Name || "Cliente não identificado";
-        const numeroCliente = req.body.visitor?.PhoneNumber || "Número não identificado";
+app.post("/conversa", (req, res) => {
+  const { cliente, vendedor, mensagem } = req.body;
 
-        console.log("📩 Mensagem recebida:", message);
-        console.log("👤 Cliente:", nomeCliente);
-        console.log("📞 Número do Cliente:", numeroCliente);
-        console.log("🙋 Vendedor:", nomeVendedor);
-        console.log("📧 E-mail do Vendedor:", emailVendedor);
-        console.log("📡 Canal:", canal);
+  if (!cliente || !vendedor || !mensagem) {
+    console.log("[Erro] Payload incompleto.");
+    return res.status(400).json({ status: "erro", mensagem: "Campos obrigatórios ausentes." });
+  }
 
-        res.json({ status: "ok", recebido: true });
-    } catch (err) {
-        console.error("Erro no processamento da conversa:", err);
-        res.status(500).json({ status: "erro", erro: err.message });
-    }
+  console.log("📩 Mensagem recebida:", mensagem);
+  console.log("👤 Cliente:", cliente);
+  console.log("🙋 Vendedor:", vendedor);
+
+  res.status(200).json({ status: "ok", mensagem: "Análise recebida com sucesso." });
 });
 
-app.listen(port, () => {
-    console.log(`🚀 Servidor rodando na porta ${port}`);
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor rodando na porta ${PORT}`);
 });
