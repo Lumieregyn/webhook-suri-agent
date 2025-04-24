@@ -6,7 +6,8 @@ const PORT = process.env.PORT || 10000;
 app.use(bodyParser.json());
 
 app.post('/conversa', (req, res) => {
-  const payload = req.body.payload;
+  console.log('[DEBUG] Body completo recebido:', JSON.stringify(req.body, null, 2));
+
 
   if (!payload || !payload.user || !payload.attendant || !payload.channel || !payload.message) {
     console.log("[Erro] Payload incompleto.");
