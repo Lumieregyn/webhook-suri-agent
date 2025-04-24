@@ -1,79 +1,45 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const axios = require('axios');
 const app = express();
+const PORT = process.env.PORT || 10000;
 
 app.use(cors());
 app.use(bodyParser.json());
 
-const PORT = process.env.PORT || 10000;
+app.get('/', (req, res) => {
+    res.json({ status: "ok", mensagem: "Servidor webhook ativo para análise de conversas." });
+});
 
-function gerarMensagemAlerta(dados) {
-    const { vendedor, cliente, alertas } = dados;
-    const corpoAlerta = alertas.map(item => `⚠️ ${item}`).join("\n");
-
-    return `🚨 ALERTA COMERCIAL – LUMIÉREGYN
-
-Vendedor(a): ${vendedor}
-Cliente: ${cliente}
-
-${corpoAlerta}
-
-👉 Por favor, valide essas informações com o cliente antes de finalizar o pedido.
-
-Sugestão: “Só confirmando, o prazo estimado de entrega é de X dias úteis. Está ok para você?”`;
-}
-
-app.post('/conversa', async (req, res) => {
-    const { cliente, vendedor, checklist } = req.body;
-
-    const camposObrigatorios = ["produto", "cor", "medidas", "quantidade", "tensao", "prazo", "resumo"];
-    const alertas = [];
-
-    camposObrigatorios.forEach(campo => {
-        if (!checklist[campo]) {
-            alertas.push(`Falta confirmar: ${campo}`);
-        }
-    });
-
-    const status = alertas.length > 0 ? "incompleto" : "completo";
-    const mensagem = gerarMensagemAlerta({ vendedor, cliente, alertas });
-
-    // Envio para o WhatsApp via SURI
+app.post('/conversa', (req, res) => {
     try {
-        await axios.post("https://api.suri.ai/send-message", {
-            number: "554731703288",
-            message: mensagem
-        }, {
-            headers: {
-                Authorization: "Bearer c3b5eca4-707f-46df-852c-7ad6790d61f9"
-            }
+        const { cliente, vendedor, checklist } = req.body;
+
+        if (!checklist || typeof checklist !== 'object') {
+            return res.status(400).json({ status: "erro", mensagem: "Corpo da requisição incompleto ou inválido." });
+        }
+
+        const pendencias = [];
+        Object.entries(checklist).forEach(([key, value]) => {
+            if (value === false) pendencias.push(`⚠️ Falta confirmar: ${key}`);
         });
 
-        res.json({
+        const status = pendencias.length ? "incompleto" : "completo";
+        const resposta = {
             status,
             cliente,
             vendedor,
             checklist,
-            alertas,
-            enviado: true,
-            mensagem
-        });
-    } catch (erro) {
-        res.json({
-            status: "erro",
-            enviado: false,
-            erro: erro.message
-        });
-    }
-});
+            alertas: pendencias,
+            sugestao: pendencias.length ? "Recomenda-se validar os pontos pendentes antes de seguir com o pedido." : "Checklist completo, pronto para prosseguir."
+        };
 
-app.get('/', (req, res) => {
-    res.json({
-        status: "ok",
-        mensagem: "Servidor webhook ativo para análise de conversas."
-    });
+        console.log("🔎 Conversa analisada:", resposta);
+        res.json(resposta);
+    } catch (erro) {
+        console.error("Erro interno:", erro);
+        res.status(500).json({ status: "erro", mensagem: "Erro ao processar a conversa.", erro: erro.message });
+    }
 });
 
 app.listen(PORT, () => {
