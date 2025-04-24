@@ -1,41 +1,45 @@
-
+require('dotenv').config();
 const express = require('express');
-const bodyParser = require('body-parser');
-
 const app = express();
-const PORT = process.env.PORT || 10000;
 
-app.use(bodyParser.json());
+// Configuração do body parser
+app.use(express.json({ limit: '5mb', strict: false }));
+app.use(express.urlencoded({ extended: true }));
 
+// Endpoint de webhook
 app.post('/conversa', (req, res) => {
-    const payload = req.body.payload;
+  console.log('⛳ Chegou payload em /conversa:', JSON.stringify(req.body, null, 2));
 
-    if (!payload || !payload.user || !payload.attendant || !payload.channel || !payload.message) {
-        console.error("[Erro] Payload incompleto.");
-        return res.status(400).json({ status: "erro", mensagem: "Payload incompleto." });
-    }
+  const p = req.body.payload;
+  const user = p?.user || {};
+  const attendant = p?.attendant || {};
+  const channel = p?.channel || {};
+  const message = p?.message || {};
 
-    const nomeCliente = payload.user.Name || "Cliente não identificado";
-    const numeroCliente = payload.user.Phone || "Número não identificado";
-    const nomeVendedor = payload.attendant.Name || "Vendedor não identificado";
-    const emailVendedor = payload.attendant.Email || "E-mail não identificado";
-    const canal = payload.channel.Name || "Canal não identificado";
-    const textoMensagem = payload.message.text || "[Mensagem sem texto]";
+  const required = [
+    ['payload.user.Name', user.Name],
+    ['payload.user.Phone', user.Phone],
+    ['payload.attendant.Name', attendant.Name],
+    ['payload.attendant.Email', attendant.Email],
+    ['payload.channel.Name', channel.Name],
+    ['payload.message.text', message.text]
+  ];
 
-    console.log("📩 Mensagem recebida:", textoMensagem);
-    console.log("👤 Cliente:", nomeCliente);
-    console.log("📞 Número do Cliente:", numeroCliente);
-    console.log("🙋 Vendedor:", nomeVendedor);
-    console.log("📧 E-mail do Vendedor:", emailVendedor);
-    console.log("📡 Canal:", canal);
+  const missing = required
+    .filter(([_, value]) => value === undefined || value === null || value === '')
+    .map(([field]) => field);
 
-    res.json({ status: "ok", mensagem: "Mensagem analisada com sucesso." });
+  if (missing.length) {
+    console.error(`[Erro] Payload incompleto. Faltando: ${missing.join(', ')}`);
+    return res.status(400).json({ error: 'Payload incompleto', faltando: missing });
+  }
+
+  // TODO: implementar lógica de análise e disparo de alertas aqui
+
+  res.status(200).json({ status: 'ok' });
 });
 
-app.get('/', (req, res) => {
-    res.json({ status: "ok", mensagem: "Servidor webhook ativo para análise de conversas." });
-});
-
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`🚀 Servidor rodando na porta ${PORT}`);
+  console.log(`Servidor rodando na porta ${PORT}`);
 });

@@ -1,32 +1,21 @@
-# Webhook Server - Lumieregyn
+# Webhook Server LumiereGYN
 
-Servidor Node.js/Express para receber e analisar webhooks de conversas (via WhatsApp/SURI).
+Servidor Node.js com Express para receber webhooks da SURI em /conversa.
 
-## Rotas
+## Instalação
 
-- **GET /**  
-  - Retorna status de saúde do servidor.
+```bash
+npm install
+```
 
-- **POST /conversa**  
-  - Recebe JSON com campos `cliente`, `vendedor`, `mensagem` ou `checklist`.  
-  - Gera logs no console:
-    - `👤 Cliente: ...`
-    - `🙋 Vendedor: ...`
-    - `📩 Mensagem recebida: ...`
+## Configuração
 
-## Como usar
+Crie um arquivo `.env` com as variáveis necessárias.
 
-1. Instalar dependências:
-   ```bash
-   npm install
-   ```
-2. Iniciar servidor:
-   ```bash
-   npm start
-   ```
-3. Testar localmente:
-   - `GET http://localhost:10000/`  
-   - `POST http://localhost:10000/conversa` com JSON no corpo.
+## Uso
 
-4. Deploy:
-   - Suba no GitHub e conecte ao Render/Heroku.
+```bash
+npm start
+```
+
+O servidor irá iniciar na porta definida em `PORT` ou 3000.
