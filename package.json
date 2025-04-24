@@ -1,13 +1,14 @@
 {
-  "name": "webhook-server-lumieregyn",
-  "version": "1.0.2",
-  "description": "Servidor webhook para Agente Supervisor WhatsApp LumiereGYN",
+  "name": "webhook-checklist-gpt4o",
+  "version": "1.0.0",
+  "description": "Webhook com IA para análise de checklist comercial via GPT-4o",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
     "express": "^4.18.2",
-    "dotenv": "^16.0.0"
+    "dotenv": "^16.0.0",
+    "axios": "^1.6.0"
   }
 }

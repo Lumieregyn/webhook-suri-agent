@@ -1,6 +1,12 @@
-# Webhook Server LumiereGYN
+# Webhook IA Checklist – GPT-4o
 
-Servidor Node.js com Express para receber webhooks da SURI em /conversa.
+Este projeto recebe mensagens via webhook, analisa com GPT-4o se o checklist comercial foi seguido corretamente e retorna um alerta inteligente.
+
+## Requisitos
+
+- Node.js 16+
+- Conta na OpenAI com chave API (GPT-4o)
+- Endpoint ativo com SURI apontando para /conversa
 
 ## Instalação
 
@@ -8,14 +14,17 @@ Servidor Node.js com Express para receber webhooks da SURI em /conversa.
 npm install
 ```
 
-## Configuração
-
-Crie um arquivo `.env` com as variáveis necessárias.
-
 ## Uso
 
+1. Copie `.env.example` para `.env`
+2. Insira sua chave da OpenAI (`OPENAI_API_KEY`)
+3. Inicie com:
+
 ```bash
-npm start
+node index.js
 ```
 
-O servidor irá iniciar na porta definida em `PORT` ou 3000.
+## Estrutura
+
+- `index.js`: servidor Express com integração GPT
+- `prompt_checklist_gpt4o.txt`: prompt inteligente de checklist
