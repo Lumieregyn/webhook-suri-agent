@@ -1,13 +1,14 @@
 
 {
-  "name": "webhook-suri",
+  "name": "webhook-suri-ajustado",
   "version": "1.0.0",
-  "description": "Webhook para integração com SURI",
+  "description": "Webhook ajustado para integração com SURI",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
   }
 }
