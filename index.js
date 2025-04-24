@@ -1,19 +1,19 @@
-
 const express = require('express');
 const app = express();
 app.use(express.json());
 
-app.get('/', (req, res) => {
-    res.send({ status: 'ok', mensagem: 'Servidor webhook com retorno de lista ativo.' });
-});
+app.post('/conversa', (req, res) => {
+    const dados = req.body;
 
-app.post('/produtos', (req, res) => {
-    const produtos = [
-        { nome: "Lustre Dourado", codigo: "LD-001", prazo: "15 dias úteis" },
-        { nome: "Arandela Preta", codigo: "AR-045", prazo: "10 dias úteis" },
-        { nome: "Pendente Cobre", codigo: "PC-212", prazo: "20 dias úteis" }
-    ];
-    res.status(200).json(produtos);
+    console.log('[Nova análise recebida]');
+    console.log(dados);
+
+    // Aqui pode entrar a lógica de checklist/validação/alerta
+    res.json({
+        status: 'ok',
+        mensagem: 'Conversa recebida e processada.',
+        recebido: dados
+    });
 });
 
 const PORT = process.env.PORT || 10000;
