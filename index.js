@@ -7,7 +7,7 @@ const app = express();
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const SURI_API_URL = process.env.SURI_API_URL;
 const SURI_API_TOKEN = process.env.SURI_API_TOKEN;
-const GESTOR_PHONE = "5562985299728"; // número fixo do gestor
+const GESTOR_PHONE = "5562985299728";
 const PROMPT_TEMPLATE = fs.readFileSync('./prompt_checklist_gpt4o.txt', 'utf8');
 
 app.use(express.json({ limit: '10mb', strict: false }));
@@ -16,7 +16,6 @@ app.use(express.urlencoded({ extended: true }));
 function montarConteudoConversacional(message) {
   let conteudo = '';
   if (message.text) conteudo += `Texto: ${message.text}\n`;
-
   if (Array.isArray(message.attachments)) {
     message.attachments.forEach((att, idx) => {
       const tipo = att.type || 'arquivo';
@@ -115,11 +114,8 @@ Responsável: *${attendant.Name}*
 Revisar agora antes de gerar a venda.`;
 
       await enviarMensagemWhatsApp(GESTOR_PHONE, alerta);
-
       if (user.Phone) {
         await enviarMensagemWhatsApp(user.Phone, alerta);
-      } else {
-        console.log('📭 Cliente sem número. Enviar ao grupo manualmente.');
       }
     }
 

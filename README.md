@@ -1,11 +1,11 @@
-# Webhook Checklist + Alerta via WhatsApp (SURI)
+# Webhook Checklist com IA + Alerta WhatsApp
 
-Servidor Node.js com integração GPT-4o + envio de alerta para gestor e vendedor via SURI.
+Este projeto recebe payloads via SURI, analisa com GPT-4o e envia alertas automáticos via WhatsApp.
 
-## Passos
+## Uso
 
-1. Crie o arquivo `.env` com base em `.env.example`
-2. Rode `npm install`
-3. Inicie com `node index.js`
+1. Preencha o arquivo `.env` com suas chaves
+2. Execute `npm install`
+3. Rode com `node index.js`
 
-O servidor recebe payloads da SURI, analisa com IA e dispara alertas automáticos.
+O endpoint `/conversa` receberá mensagens da SURI.

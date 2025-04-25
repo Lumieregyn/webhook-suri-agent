@@ -1,7 +1,7 @@
 {
-  "name": "webhook-checklist-alerta-suri",
+  "name": "webhook-checklist",
   "version": "1.0.0",
-  "description": "Servidor webhook com checklist IA e envio automático WhatsApp via SURI",
+  "description": "Agente com IA para análise de checklist comercial + envio automático via WhatsApp (SURI)",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
